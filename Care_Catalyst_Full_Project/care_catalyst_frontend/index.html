@@ -7,7 +7,7 @@
   <meta name="description" content="Care Catalyst helps you organize health information and prepare for care conversations.">
   <title>Care Catalyst — Your health, more organized</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/app.js" defer></script>
+  <script src="js/api-client.js" defer></script><script src="js/app.js" defer></script>
 </head>
 <body data-page="dashboard">
   <div class="app-shell">
@@ -28,16 +28,17 @@
       </nav>
       <div class="sidebar-note">
         <div class="note-symbol">♡</div>
-        <strong>Your health information stays on this device.</strong>
-        <p>This prototype stores records in your browser, not a shared cloud database.</p>
+        <strong>Local development workspace.</strong>
+        <p>Records are stored in a local SQLite database on this computer; there is no cloud sync.</p>
         <a href="privacy.html">Privacy &amp; limitations <span>↗</span></a>
+        <a href="auth.html">Local API account <span>↗</span></a>
       </div>
       <div class="sidebar-bottom"><span class="status-dot"></span> Local prototype <span class="version">v1.0</span></div>
     </aside>
 
     <main class="main-content">
       <header class="topbar">
-        <button class="mobile-menu" id="menuToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <button class="mobile-menu" id="menuToggle" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
         <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong>Overview</strong></div>
         <div class="topbar-right"><span class="today-label" id="todayLabel">Your health workspace</span><div class="avatar">CC</div></div>
       </header>

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Symptom Library — Care Catalyst</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/api-client.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <style>
+    .symptom-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .symptom-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 13px;
+      border: 1px solid var(--border, #dce5e1);
+      border-radius: 12px;
+      background: var(--surface, #fff);
+      cursor: pointer;
+    }
+    .symptom-option:has(input:checked) {
+      border-color: var(--primary, #287a68);
+      background: #edf7f2;
+    }
+    .symptom-option input { margin-top: 4px; }
+    .symptom-option strong { display: block; }
+    .symptom-option small {
+      display: block;
+      margin-top: 4px;
+      color: #5d6b66;
+      line-height: 1.4;
+    }
+    .symptom-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .symptom-toolbar input,
+    .symptom-toolbar select {
+      flex: 1;
+      min-width: 180px;
+    }
+    .selected-summary {
+      margin: 14px 0;
+      padding: 12px;
+      background: #edf7f2;
+      border-radius: 10px;
+    }
+    .result-card {
+      border: 1px solid var(--border, #dce5e1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .result-card h3 { margin-top: 0; }
+    .result-card p { line-height: 1.55; }
+    .match-label {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #edf7f2;
+      color: #205b4b;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .safety-alert {
+      padding: 15px;
+      border: 1px solid #dba4a4;
+      border-radius: 12px;
+      background: #fff0f0;
+      color: #762727;
+      margin: 12px 0;
+    }
+    .safety-alert h3 { margin-top: 0; }
+    .disclaimer-box {
+      padding: 14px;
+      border-left: 4px solid #c28b2c;
+      background: #fff8e8;
+      margin-top: 18px;
+      line-height: 1.55;
+    }
+    .hidden { display: none !important; }
+    .muted { color: #62716b; }
+    @media (max-width: 600px) {
+      .symptom-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body data-page="symptoms">
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">♡</span>
+      <span><strong>Care Catalyst</strong>
+        <small>Better information. Healthier decisions.</small>
+      </span>
+    </a>
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="nav-list">
+      <a class="nav-link" href="index.html">⌂　Dashboard</a>
+      <a class="nav-link" href="patients.html">♙　Patients</a>
+      <a class="nav-link" href="care-pathway.html">⌁　Care Pathway</a>
+      <a class="nav-link" href="health-story.html">◷　Health Story</a>
+      <a class="nav-link" href="follow-ups.html">▣　Follow-ups</a>
+      <a class="nav-link" href="visit-brief.html">▤　Doctor Visit Brief</a>
+      <a class="nav-link active" href="symptoms.html">⌕　Symptom Library</a>
+    </nav>
+    <div class="sidebar-note">
+      <strong>Education, not diagnosis.</strong>
+      <p>This tool helps organise symptoms and explore general health information.</p>
+      <a href="privacy.html">Privacy &amp; limitations ↗</a>
+    </div>
+    <div class="sidebar-bottom">● Local prototype <span class="version">v1.0</span></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <button class="mobile-menu" id="menuToggle" type="button"
+        aria-label="Open navigation" aria-controls="sidebar"
+        aria-expanded="false">☰</button>
+      <div class="breadcrumb">Workspace　/　<strong>Symptom Library</strong></div>
+      <div class="topbar-right"><div class="avatar">CC</div></div>
+    </header>
+
+    <section class="page-head">
+      <div>
+        <div class="eyebrow">SYMPTOM ASSESSMENT &amp; HEALTH INFORMATION</div>
+        <h1>Symptom Library</h1>
+        <p>Select several symptoms to explore general condition information and prepare for a healthcare consultation.</p>
+      </div>
+    </section>
+
+    <section class="warning-card">
+      <strong>Emergency warning</strong>
+      <p>Severe difficulty breathing, severe or persistent chest pain,
+      sudden facial drooping or one-sided weakness, new trouble speaking,
+      loss of consciousness, or another life-threatening symptom needs
+      emergency assessment. In India, call 112. Do not wait for this tool
+      to finish analysing symptoms.</p>
+    </section>
+
+    <section class="form-card">
+      <h2>1. Select a patient and symptoms</h2>
+      <p class="muted">Use fictional information for prototype testing.
+        Select every symptom that applies.</p>
+
+      <div class="field">
+        <label for="patientSelect">Link to patient record (optional)</label>
+        <select id="patientSelect">
+          <option value="">No patient selected</option>
+        </select>
+      </div>
+
+      <div class="symptom-toolbar">
+        <input id="symptomSearch" type="search"
+          placeholder="Search symptoms, e.g. headache or nausea"
+          aria-label="Search symptoms">
+        <select id="categoryFilter" aria-label="Filter by body system">
+          <option value="">All body systems</option>
+          <option value="General">General</option>
+          <option value="Respiratory">Respiratory</option>
+          <option value="Neurological">Neurological</option>
+          <option value="Digestive">Digestive</option>
+          <option value="Heart and circulation">Heart and circulation</option>
+          <option value="Urinary">Urinary</option>
+          <option value="Skin">Skin</option>
+          <option value="Musculoskeletal">Muscles and joints</option>
+          <option value="ENT and eyes">Ear, nose, throat and eyes</option>
+          <option value="Mental wellbeing">Sleep and wellbeing</option>
+        </select>
+      </div>
+
+      <div class="symptom-toolbar">
+        <span class="muted" id="symptomCount" aria-live="polite">0 symptoms selected</span>
+        <button class="small-button" id="clearSymptoms" type="button">Clear selection</button>
+      </div>
+
+      <div id="symptomGrid" class="symptom-grid"></div>
+
+      <div class="selected-summary">
+        <strong>Selected symptoms:</strong>
+        <span id="selectedNames">None selected</span>
+      </div>
+
+      <div class="field">
+        <label for="duration">How long have symptoms been present?</label>
+        <select id="duration">
+          <option value="">Not specified</option>
+          <option>Started today</option>
+          <option>1–3 days</option>
+          <option>4–7 days</option>
+          <option>More than a week</option>
+          <option>Recurring or comes and goes</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="trend">How are the symptoms changing?</label>
+        <select id="trend">
+          <option value="">Not specified</option>
+          <option>Improving</option>
+          <option>Staying about the same</option>
+          <option>Getting worse</option>
+          <option>Coming and going</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="extraNotes">Additional information (optional)</label>
+        <textarea id="extraNotes" rows="3"
+          placeholder="For example: when symptoms started, measured temperature, or relevant context. Avoid unnecessary personal details."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="button button-primary" id="analyseButton" type="button">
+          Explore possible conditions
+        </button>
+      </div>
+    </section>
+
+    <section class="form-card hidden" id="resultsSection" aria-live="polite">
+      <h2>2. Symptom-matching results</h2>
+      <p class="muted">
+        These are educational matches from a small, rule-based demonstration
+        library. They are not diagnoses, probabilities, or a substitute
+        for clinical assessment.
+      </p>
+      <div id="safetyMessages"></div>
+      <div id="conditionResults"></div>
+      <div class="disclaimer-box">
+        <strong>Important:</strong> Different conditions can cause similar
+        symptoms, and serious conditions may not match a simple rule.
+        A match does not mean that a person has that condition. A lack of
+        matches does not mean that the person is healthy. Contact a qualified
+        healthcare professional for assessment, especially if symptoms
+        are new, persistent, severe, or worsening.
+      </div>
+      <div class="form-actions">
+        <button class="button button-primary" id="saveAssessment" type="button">
+          Save assessment to Health Story
+        </button>
+        <a class="button button-secondary" href="visit-brief.html">
+          Prepare doctor visit brief
+        </a>
+      </div>
+      <p class="muted" id="saveStatus" role="status"></p>
+    </section>
+
+    <section class="form-card">
+      <h2>Trusted health information</h2>
+      <p>Use reliable sources to learn more, and discuss your own symptoms
+        with a qualified healthcare professional.</p>
+      <div class="record-list">
+        <div class="record-card">
+          <div class="record-avatar">↗</div>
+          <div class="record-main">
+            <strong>MedlinePlus</strong>
+            <p>General health and symptom information.</p>
+            <a class="text-link" target="_blank" rel="noopener noreferrer"
+              href="https://medlineplus.gov/symptoms.html">Visit MedlinePlus ↗</a>
+          </div>
+        </div>
+        <div class="record-card">
+          <div class="record-avatar">↗</div>
+          <div class="record-main">
+            <strong>World Health Organization</strong>
+            <p>Public-health information and guidance.</p>
+            <a class="text-link" target="_blank" rel="noopener noreferrer"
+              href="https://www.who.int/health-topics">Visit WHO ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Care Catalyst · Educational information only</span>
+      <span><a href="care-pathway.html">Care Pathway</a></span>
+    </footer>
+  </main>
+</div>
+<div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /*
+    Educational prototype only.
+    This is transparent symptom-overlap matching, not a diagnostic model.
+    The condition rules need qualified clinical review before real-world use.
+  */
+
+  var symptoms = [
+    ["fever","Fever or high temperature","General"],
+    ["chills","Chills or shivering","General"],
+    ["fatigue","Unusual tiredness or fatigue","General"],
+    ["weakness","General weakness","General"],
+    ["loss-appetite","Reduced appetite","General"],
+    ["weight-loss","Unintentional weight loss","General"],
+    ["night-sweats","Night sweats","General"],
+    ["dehydration","Possible dehydration or very little urine","General"],
+
+    ["cough","Cough","Respiratory"],
+    ["dry-cough","Dry cough","Respiratory"],
+    ["phlegm","Cough with mucus or phlegm","Respiratory"],
+    ["short-breath","Shortness of breath","Respiratory"],
+    ["wheeze","Wheezing","Respiratory"],
+    ["chest-tightness","Chest tightness","Respiratory"],
+    ["runny-nose","Runny or blocked nose","Respiratory"],
+
+    ["headache","Headache","Neurological"],
+    ["migraine-like","Throbbing headache or light sensitivity","Neurological"],
+    ["dizziness","Dizziness or feeling faint","Neurological"],
+    ["vertigo","Spinning sensation or vertigo","Neurological"],
+    ["confusion","New confusion or disorientation","Neurological"],
+    ["numbness","New numbness or tingling","Neurological"],
+    ["one-side-weakness","Sudden weakness on one side","Neurological"],
+    ["speech-difficulty","Sudden difficulty speaking","Neurological"],
+
+    ["nausea","Nausea","Digestive"],
+    ["vomiting","Vomiting","Digestive"],
+    ["diarrhoea","Diarrhoea","Digestive"],
+    ["constipation","Constipation","Digestive"],
+    ["abdominal-pain","Abdominal or stomach pain","Digestive"],
+    ["bloating","Bloating or excess gas","Digestive"],
+    ["heartburn","Heartburn or acid reflux","Digestive"],
+    ["blood-stool","Blood in stool or black stool","Digestive"],
+
+    ["chest-pain","Chest pain or pressure","Heart and circulation"],
+    ["palpitations","Fast, pounding or irregular heartbeat","Heart and circulation"],
+    ["leg-swelling","New swelling in one or both legs","Heart and circulation"],
+    ["fainting","Fainting or loss of consciousness","Heart and circulation"],
+
+    ["urinary-pain","Pain or burning when urinating","Urinary"],
+    ["frequent-urination","Urinating more often than usual","Urinary"],
+    ["blood-urine","Blood in urine","Urinary"],
+    ["back-flank-pain","Pain in the side or back near the waist","Urinary"],
+
+    ["rash","Skin rash","Skin"],
+    ["itching","Itching","Skin"],
+    ["hives","Raised itchy welts or hives","Skin"],
+    ["swelling-face","Swelling of the face, lips or tongue","Skin"],
+
+    ["joint-pain","Joint pain","Musculoskeletal"],
+    ["muscle-aches","Muscle aches","Musculoskeletal"],
+    ["back-pain","Back pain","Musculoskeletal"],
+
+    ["sore-throat","Sore throat","ENT and eyes"],
+    ["ear-pain","Ear pain","ENT and eyes"],
+    ["eye-redness","Red or irritated eyes","ENT and eyes"],
+    ["loss-smell","Reduced sense of smell or taste","ENT and eyes"],
+    ["pain-swallow","Pain when swallowing","ENT and eyes"],
+
+    ["poor-sleep","Difficulty sleeping","Mental wellbeing"],
+    ["anxiety","Anxiety or feeling unusually on edge","Mental wellbeing"],
+    ["low-mood","Persistent low mood","Mental wellbeing"],
+    ["poor-concentration","Difficulty concentrating","Mental wellbeing"]
+  ].map(function (s) {
+    return { id: s[0], name: s[1], category: s[2] };
+  });
+
+  /*
+    Each rule contains a general condition topic and related symptoms.
+    Matching is based only on overlap with selected symptoms.
+    This list is intentionally not exhaustive.
+  */
+  var conditions = [
+    {
+      name: "Common cold or another mild respiratory infection",
+      symptoms: ["cough","dry-cough","runny-nose","sore-throat","sneezing","fatigue"],
+      note: "Cold-like symptoms can overlap with several respiratory infections."
+    },
+    {
+      name: "Influenza-like illness",
+      symptoms: ["fever","chills","cough","headache","muscle-aches","fatigue","weakness"],
+      note: "Flu-like illness can cause sudden general aches and fever. Other infections may look similar."
+    },
+    {
+      name: "COVID-19 or another respiratory infection",
+      symptoms: ["fever","cough","short-breath","fatigue","sore-throat","runny-nose","headache","loss-smell","muscle-aches"],
+      note: "Symptoms alone cannot reliably distinguish COVID-19 from other infections."
+    },
+    {
+      name: "Allergic rhinitis or another allergy",
+      symptoms: ["runny-nose","itching","eye-redness","hives"],
+      note: "Allergies may cause nasal or eye irritation. Facial or tongue swelling or breathing difficulty can be an emergency."
+    },
+    {
+      name: "Asthma-related breathing symptoms",
+      symptoms: ["wheeze","short-breath","chest-tightness","dry-cough"],
+      note: "Wheezing and breathlessness need appropriate assessment, particularly if new or worsening."
+    },
+    {
+      name: "Migraine-type headache",
+      symptoms: ["headache","migraine-like","nausea","vomiting","eye-redness"],
+      note: "A new, sudden, severe headache or headache with neurological symptoms needs urgent assessment."
+    },
+    {
+      name: "Tension-type headache",
+      symptoms: ["headache","poor-sleep","anxiety","poor-concentration"],
+      note: "Headaches have many causes; a clinician can help assess recurring or unusual headaches."
+    },
+    {
+      name: "Gastroenteritis or a stomach infection",
+      symptoms: ["nausea","vomiting","diarrhoea","abdominal-pain","fever","chills","dehydration"],
+      note: "Vomiting or diarrhoea can cause dehydration. Blood in stool, severe pain or inability to keep fluids down warrants prompt care."
+    },
+    {
+      name: "Acid reflux or indigestion",
+      symptoms: ["heartburn","bloating","nausea","abdominal-pain"],
+      note: "Digestive discomfort can have different causes. Chest pain should not automatically be attributed to indigestion."
+    },
+    {
+      name: "Constipation-related symptoms",
+      symptoms: ["constipation","abdominal-pain","bloating","nausea"],
+      note: "Severe abdominal pain, persistent vomiting, or a swollen abdomen needs urgent assessment."
+    },
+    {
+      name: "Urinary tract infection (UTI)",
+      symptoms: ["urinary-pain","frequent-urination","fever","back-flank-pain","blood-urine"],
+      note: "Urinary symptoms may need a clinical assessment and urine testing. Fever with side or back pain needs prompt care."
+    },
+    {
+      name: "Possible kidney or urinary tract problem",
+      symptoms: ["back-flank-pain","blood-urine","nausea","vomiting","urinary-pain","fever"],
+      note: "Pain around the side or back with blood in urine, fever or vomiting should be assessed promptly."
+    },
+    {
+      name: "Dermatitis or skin irritation",
+      symptoms: ["rash","itching"],
+      note: "Rashes have many causes. A rapidly spreading rash, facial swelling or breathing difficulty needs urgent assessment."
+    },
+    {
+      name: "Hives or an allergic reaction",
+      symptoms: ["hives","itching","rash","swelling-face"],
+      note: "Swelling of the lips, tongue or throat, or any breathing difficulty, can indicate a life-threatening allergic reaction."
+    },
+    {
+      name: "Muscle strain or musculoskeletal pain",
+      symptoms: ["muscle-aches","back-pain","joint-pain"],
+      note: "Pain may arise from several causes. Severe pain after injury or with fever needs medical assessment."
+    },
+    {
+      name: "Ear, nose or throat infection",
+      symptoms: ["ear-pain","sore-throat","fever","pain-swallow","runny-nose"],
+      note: "Persistent symptoms or difficulty swallowing need assessment. Trouble breathing or inability to swallow saliva is urgent."
+    },
+    {
+      name: "Anaemia or another cause of fatigue",
+      symptoms: ["fatigue","weakness","dizziness","palpitations"],
+      note: "Fatigue and weakness have many possible causes. A clinician may recommend an examination or blood tests."
+    },
+    {
+      name: "Sleep-related or stress-related symptoms",
+      symptoms: ["poor-sleep","fatigue","anxiety","poor-concentration","low-mood","headache"],
+      note: "Sleep and stress can affect wellbeing, but physical causes should also be considered."
+    },
+    {
+      name: "Mood or anxiety-related concerns",
+      symptoms: ["anxiety","low-mood","poor-sleep","poor-concentration","fatigue"],
+      note: "These symptoms can have multiple causes. A qualified professional can help assess ongoing or distressing symptoms."
+    },
+    {
+      name: "Possible heart or circulation problem",
+      symptoms: ["chest-pain","short-breath","palpitations","fainting","leg-swelling","weakness"],
+      note: "This rule is not a way to rule in or rule out heart disease. New or severe chest pain, fainting or breathing difficulty needs urgent assessment."
+    },
+    {
+      name: "Possible neurological problem",
+      symptoms: ["headache","dizziness","confusion","numbness","one-side-weakness","speech-difficulty","fainting"],
+      note: "Sudden confusion, one-sided weakness, trouble speaking or loss of consciousness requires emergency assessment."
+    },
+    {
+      name: "Possible dehydration",
+      symptoms: ["dehydration","dizziness","weakness","fatigue","vomiting","diarrhoea"],
+      note: "Dehydration may require prompt care, especially with very little urine, fainting, confusion or inability to drink."
+    },
+    {
+      name: "Possible inflammatory or infectious illness",
+      symptoms: ["fever","chills","fatigue","joint-pain","rash","muscle-aches"],
+      note: "Fever with a new rash, severe headache, confusion or marked deterioration needs urgent medical assessment."
+    }
+  ];
+
+  var redFlags = {
+    "short-breath": "Breathing difficulty can be serious. Severe or sudden difficulty breathing needs emergency care.",
+    "chest-pain": "New, severe or persistent chest pain may be an emergency, especially with sweating, nausea, faintness or breathing difficulty.",
+    "one-side-weakness": "Sudden one-sided weakness may be a stroke warning sign. Seek emergency help immediately.",
+    "speech-difficulty": "Sudden difficulty speaking may be a stroke warning sign. Seek emergency help immediately.",
+    "confusion": "Sudden or severe confusion needs urgent medical assessment.",
+    "fainting": "Fainting or loss of consciousness may be serious, especially with chest pain, injury or breathing difficulty.",
+    "swelling-face": "Swelling of the lips, tongue or throat can be life-threatening, especially with breathing difficulty.",
+    "blood-stool": "Blood in stool or black, tarry stool needs prompt medical assessment.",
+    "blood-urine": "Visible blood in urine needs medical assessment.",
+    "dehydration": "Severe dehydration signs, confusion, fainting or inability to keep fluids down require urgent care."
+  };
+
+  var selected = {};
+  var latestAssessment = null;
+
+  function el(id) { return document.getElementById(id); }
+
+  function escapeText(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return {
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+      }[ch];
+    });
+  }
+
+  function refreshPatients() {
+    var select = el("patientSelect");
+    if (!select || !window.CareCatalyst) return;
+    var previous = select.value;
+    var patients = window.CareCatalyst.read("patients") || [];
+    select.innerHTML = '<option value="">No patient selected</option>';
+    patients.forEach(function (p) {
+      var option = document.createElement("option");
+      option.value = p.id;
+      option.textContent = p.name || "Unnamed patient";
+      select.appendChild(option);
+    });
+    if (patients.some(function (p) { return p.id === previous; })) {
+      select.value = previous;
+    }
+  }
+
+  function renderSymptoms() {
+    var query = el("symptomSearch").value.trim().toLowerCase();
+    var category = el("categoryFilter").value;
+    var found = symptoms.filter(function (s) {
+      return (!category || s.category === category) &&
+        (!query || (s.name + " " + s.category).toLowerCase().indexOf(query) >= 0);
+    });
+
+    el("symptomGrid").innerHTML = found.map(function (s) {
+      return '<label class="symptom-option">' +
+        '<input type="checkbox" data-symptom="' + escapeText(s.id) + '"' +
+        (selected[s.id] ? " checked" : "") + '>' +
+        '<span><strong>' + escapeText(s.name) + '</strong>' +
+        '<small>' + escapeText(s.category) + '</small></span></label>';
+    }).join("") || '<p class="muted">No symptoms found. Try another search.</p>';
+
+    var names = symptoms.filter(function (s) { return selected[s.id]; })
+      .map(function (s) { return s.name; });
+
+    el("symptomCount").textContent = names.length + " symptom" +
+      (names.length === 1 ? "" : "s") + " selected";
+    el("selectedNames").textContent = names.length ? names.join(", ") : "None selected";
+  }
+
+  function analyseSymptoms() {
+    var chosen = symptoms.filter(function (s) { return selected[s.id]; });
+    if (!chosen.length) {
+      alert("Please select at least one symptom first.");
+      return;
+    }
+
+    var chosenIds = chosen.map(function (s) { return s.id; });
+    var resultSection = el("resultsSection");
+    var safety = chosen.filter(function (s) { return redFlags[s.id]; });
+    var safetyHtml = "";
+
+    if (safety.length) {
+      safetyHtml = '<div class="safety-alert"><h3>Safety information</h3><ul>' +
+        safety.map(function (s) {
+          return "<li><strong>" + escapeText(s.name) + ":</strong> " +
+            escapeText(redFlags[s.id]) + "</li>";
+        }).join("") +
+        '</ul><p><strong>Do not rely on symptom matching to assess urgency.</strong> ' +
+        'If symptoms are severe, sudden or life-threatening, seek emergency care now.</p></div>';
+    } else {
+      safetyHtml = '<div class="notice notice-info"><span>i</span><p>' +
+        'No listed warning trigger was selected. This does not establish that the symptoms are safe or non-urgent.</p></div>';
+    }
+
+    var ranked = conditions.map(function (condition) {
+      var matches = condition.symptoms.filter(function (id) {
+        return chosenIds.indexOf(id) !== -1;
+      });
+      return {
+        condition: condition,
+        matches: matches,
+        count: matches.length,
+        coverage: matches.length / condition.symptoms.length
+      };
+    }).filter(function (r) {
+      return r.count > 0;
+    }).sort(function (a, b) {
+      return b.count - a.count || b.coverage - a.coverage;
+    }).slice(0, 8);
+
+    var resultsHtml = "";
+    if (!ranked.length) {
+      resultsHtml = '<div class="empty-state"><strong>No matching topics found</strong>' +
+        '<p>The selected symptoms do not match a rule in this small demonstration library. ' +
+        'This does not rule out a medical condition. Consult a healthcare professional.</p></div>';
+    } else {
+      resultsHtml = '<p>Results are ordered by the number of selected symptoms matching each rule. ' +
+        'This order is not a disease probability or a clinical risk ranking.</p>' +
+        ranked.map(function (r) {
+          var matchedNames = r.matches.map(function (id) {
+            var s = symptoms.find(function (x) { return x.id === id; });
+            return s ? s.name : id;
+          });
+          return '<article class="result-card">' +
+            '<h3>' + escapeText(r.condition.name) + '</h3>' +
+            '<span class="match-label">' + r.count + ' matching symptom' +
+            (r.count === 1 ? "" : "s") + '</span>' +
+            '<p><strong>Symptoms that matched:</strong> ' +
+            escapeText(matchedNames.join(", ")) + '</p>' +
+            '<p>' + escapeText(r.condition.note) + '</p>' +
+            '<p class="muted">This is a rule-based educational match, not a diagnosis.</p>' +
+            '</article>';
+        }).join("");
+    }
+
+    var chosenNames = chosen.map(function (s) { return s.name; });
+    latestAssessment = {
+      patientId: el("patientSelect").value,
+      symptoms: chosenNames.join(", "),
+      symptomItems: chosenNames,
+      duration: el("duration").value,
+      trend: el("trend").value,
+      context: el("extraNotes").value.trim(),
+      source: "User-reported",
+      resultSummary: ranked.map(function (r) {
+        return r.condition.name + " (" + r.count + " matching symptoms)";
+      }),
+      disclaimer: "Educational symptom overlap only. Not a diagnosis or probability."
+    };
+
+    el("safetyMessages").innerHTML = safetyHtml;
+    el("conditionResults").innerHTML = resultsHtml;
+    el("saveStatus").textContent = "";
+    resultSection.classList.remove("hidden");
+    resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function saveAssessment() {
+    if (!latestAssessment) return;
+    refreshPatients();
+
+    if (!window.CareCatalyst ||
+        typeof window.CareCatalyst.saveAssessment !== "function") {
+      el("saveStatus").textContent =
+        "The assessment could not be saved because the workspace is not ready. Refresh the page and try again.";
+      return;
+    }
+
+    var button = el("saveAssessment");
+    button.disabled = true;
+
+    var saved = window.CareCatalyst.saveAssessment(latestAssessment);
+    if (saved) {
+      el("saveStatus").textContent =
+        "Assessment saved. Open Health Story to review the recorded symptoms.";
+    } else {
+      el("saveStatus").textContent =
+        "The assessment could not be saved. Please try again.";
+    }
+    button.disabled = false;
+  }
+
+  el("symptomGrid").addEventListener("change", function (event) {
+    var id = event.target.getAttribute("data-symptom");
+    if (!id) return;
+    if (event.target.checked) selected[id] = true;
+    else delete selected[id];
+    renderSymptoms();
+  });
+
+  el("symptomSearch").addEventListener("input", renderSymptoms);
+  el("categoryFilter").addEventListener("change", renderSymptoms);
+  el("clearSymptoms").addEventListener("click", function () {
+    selected = {};
+    renderSymptoms();
+    el("resultsSection").classList.add("hidden");
+  });
+  el("analyseButton").addEventListener("click", analyseSymptoms);
+  el("saveAssessment").addEventListener("click", saveAssessment);
+
+  /*
+    Refresh the patient list after the existing workspace loads its
+    account records. The short retries are only for initial page setup.
+  */
+  refreshPatients();
+  window.setTimeout(refreshPatients, 500);
+  window.setTimeout(refreshPatients, 1500);
+  renderSymptoms();
+})();
+</script>
+</body>
+</html>

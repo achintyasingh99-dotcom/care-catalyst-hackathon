@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4fbfa">
+  <title>Account access — Care Catalyst</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/api-client.js" defer></script>
+  <script src="js/auth.js" defer></script>
+</head>
+<body data-page="auth">
+  <main class="auth-shell">
+    <a class="brand auth-brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 41S5 30 5 17C5 8 17 4 24 14 31 4 43 8 43 17c0 13-19 24-19 24Z"/><path class="pulse" d="M9 24h9l4-9 6 18 4-9h7"/></svg></span>
+      <span><strong>Care Catalyst</strong><small>Better information. Healthier decisions.</small></span>
+    </a>
+    <section class="auth-card">
+      <p class="section-kicker">LOCAL ACCOUNT</p>
+      <h1>Sign in to your workspace</h1>
+      <p class="auth-intro">This account connects to the local Care Catalyst API. Use fictional demo information only.</p>
+      <div id="authStatus" class="notice notice-info" role="status"><span>i</span><p>Checking local server…</p></div>
+      <div class="auth-tabs" role="group" aria-label="Choose account action">
+        <button class="button button-primary" id="showLogin" type="button" aria-pressed="true">Sign in</button>
+        <button class="button button-secondary" id="showRegister" type="button" aria-pressed="false">Create account</button>
+      </div>
+      <form id="authForm" novalidate>
+        <div class="field"><label for="username">Username</label><input id="username" name="username" autocomplete="username" maxlength="60" required pattern="[A-Za-z0-9._-]+" placeholder="e.g. demo_user"></div>
+        <div class="field auth-password"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" minlength="12" required placeholder="At least 12 characters"><span class="help-text">Use a unique password; this local prototype has no password recovery.</span></div>
+        <div id="confirmWrap" class="field hidden"><label for="confirmPassword">Confirm password</label><input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="12"></div>
+        <button id="authSubmit" class="button button-primary auth-submit" type="submit">Sign in</button>
+      </form>
+      <p class="auth-footnote">This is a local development feature, not a production healthcare login system. Do not enter real patient information.</p>
+      <div class="form-actions"><a class="text-link" href="README.md">Read local setup instructions →</a></div>
+    </section>
+  </main>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
