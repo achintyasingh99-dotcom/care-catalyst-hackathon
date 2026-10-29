@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4fbfa">
+  <meta name="description" content="Care Catalyst helps you organize health information and prepare for care conversations.">
+  <title>Care Catalyst — Your health, more organized</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
+</head>
+<body data-page="dashboard">
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="index.html" aria-label="Care Catalyst home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 41S5 30 5 17C5 8 17 4 24 14 31 4 43 8 43 17c0 13-19 24-19 24Z"/><path class="pulse" d="M9 24h9l4-9 6 18 4-9h7"/></svg></span>
+        <span><strong>Care Catalyst</strong><small>Better information. Healthier decisions.</small></span>
+      </a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <a class="nav-link active" href="index.html"><span class="nav-icon">⌂</span>Dashboard</a>
+        <a class="nav-link" href="patients.html"><span class="nav-icon">♙</span>Patients</a>
+        <a class="nav-link" href="care-pathway.html"><span class="nav-icon">⌁</span>Care Pathway</a>
+        <a class="nav-link" href="health-story.html"><span class="nav-icon">◷</span>Health Story</a>
+        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">▣</span>Follow-ups</a>
+        <a class="nav-link" href="visit-brief.html"><span class="nav-icon">▤</span>Doctor Visit Brief</a>
+        <a class="nav-link" href="symptoms.html"><span class="nav-icon">⌕</span>Symptom Library</a>
+      </nav>
+      <div class="sidebar-note">
+        <div class="note-symbol">♡</div>
+        <strong>Your health information stays on this device.</strong>
+        <p>This prototype stores records in your browser, not a shared cloud database.</p>
+        <a href="privacy.html">Privacy &amp; limitations <span>↗</span></a>
+      </div>
+      <div class="sidebar-bottom"><span class="status-dot"></span> Local prototype <span class="version">v1.0</span></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="menuToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong>Overview</strong></div>
+        <div class="topbar-right"><span class="today-label" id="todayLabel">Your health workspace</span><div class="avatar">CC</div></div>
+      </header>
+      <section class="welcome-row">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR CARE, IN ONE PLACE</div>
+          <h1>A clearer picture of <span class="text-gradient">your health.</span></h1>
+          <p class="welcome-copy">Keep important details together, prepare for appointments, and stay on top of your next steps.</p>
+        </div>
+        <div class="welcome-art" aria-hidden="true"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-heart">+</div><div class="art-pill pill-one"></div><div class="art-pill pill-two"></div><div class="art-dot"></div></div>
+      </section>
+
+      <section class="quick-actions" aria-label="Quick actions">
+        <a class="action-card action-teal" href="patients.html"><span class="action-icon">＋</span><span><strong>Add a patient</strong><small>Create a health profile</small></span><span class="action-arrow">↗</span></a>
+        <a class="action-card action-blue" href="care-pathway.html"><span class="action-icon">⌕</span><span><strong>Start care pathway</strong><small>Explore symptom information</small></span><span class="action-arrow">↗</span></a>
+        <a class="action-card action-violet" href="health-story.html"><span class="action-icon">◷</span><span><strong>Record an update</strong><small>Add a timeline entry</small></span><span class="action-arrow">↗</span></a>
+        <a class="action-card action-amber" href="follow-ups.html"><span class="action-icon">▣</span><span><strong>Create follow-up</strong><small>Keep the next step visible</small></span><span class="action-arrow">↗</span></a>
+      </section>
+
+      <section class="metric-grid" aria-label="Workspace summary">
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon teal">♙</span><span class="metric-caption">PATIENT PROFILES</span></div><div class="metric-value" id="metricPatients">0</div><div class="metric-foot">Profiles saved on this device</div></article>
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon blue">⌕</span><span class="metric-caption">ASSESSMENTS</span></div><div class="metric-value" id="metricAssessments">0</div><div class="metric-foot">Symptom notes recorded</div></article>
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon amber">▣</span><span class="metric-caption">OPEN FOLLOW-UPS</span></div><div class="metric-value" id="metricFollowups">0</div><div class="metric-foot" id="followupMetricNote">Tasks that still need attention</div></article>
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon violet">◷</span><span class="metric-caption">HEALTH STORY</span></div><div class="metric-value" id="metricEntries">0</div><div class="metric-foot">Timeline entries saved</div></article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel follow-panel">
+          <div class="panel-heading"><div><div class="section-kicker">STAY ONE STEP AHEAD</div><h2>Follow-ups to review</h2></div><a class="text-link" href="follow-ups.html">View all <span>→</span></a></div>
+          <div id="dashboardFollowups" class="stack-list"><div class="empty-state compact"><span class="empty-icon">✓</span><strong>You're all caught up</strong><p>Follow-up tasks you add will appear here.</p></div></div>
+        </article>
+        <article class="panel story-panel">
+          <div class="panel-heading"><div><div class="section-kicker">YOUR RECORD, AT A GLANCE</div><h2>Recent health story</h2></div><a class="text-link" href="health-story.html">Open story <span>→</span></a></div>
+          <div id="dashboardStory" class="timeline-mini"><div class="empty-state compact"><span class="empty-icon">◷</span><strong>Your story starts here</strong><p>Add an assessment, note, or measurement to build a timeline.</p></div></div>
+        </article>
+        <article class="panel focus-panel">
+          <div class="focus-illustration"><div class="focus-ring"></div><div class="focus-cross">+</div><div class="focus-spark spark-a">✦</div><div class="focus-spark spark-b">✧</div></div>
+          <div class="section-kicker">A HELPFUL REMINDER</div><h2>Prepared, not overwhelmed.</h2>
+          <p>Small, well-organized details can make conversations with a healthcare professional more productive.</p>
+          <a class="button button-secondary button-full" href="visit-brief.html">Prepare a visit brief <span>→</span></a>
+        </article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel assessment-panel">
+          <div class="panel-heading"><div><div class="section-kicker">EDUCATIONAL INFORMATION</div><h2>Symptom library</h2></div><a class="text-link" href="symptoms.html">Explore <span>→</span></a></div>
+          <p class="panel-intro">Read plain-language information about common symptoms and what details may be useful to discuss with a clinician.</p>
+          <div class="topic-chips"><span>Headache</span><span>Fever</span><span>Cough</span><span>Fatigue</span><span>Stomach discomfort</span></div>
+          <div class="notice notice-info"><span>i</span><p><strong>Not a diagnosis.</strong> Symptom information cannot confirm or rule out a condition. Seek professional advice when concerned.</p></div>
+        </article>
+        <article class="panel privacy-panel">
+          <div class="privacy-icon">⌑</div><h2>Privacy by design</h2><p>Your current records are stored in this browser's local storage. They are not automatically shared with a clinician or synced to other devices.</p><a class="text-link" href="privacy.html">Understand the limitations <span>→</span></a>
+        </article>
+      </section>
+      <footer class="page-footer"><span>Care Catalyst <span class="footer-separator">·</span> An informational care-coordination prototype</span><span><a href="privacy.html">Privacy</a><a href="symptoms.html">Safety information</a></span></footer>
+    </main>
+  </div>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
